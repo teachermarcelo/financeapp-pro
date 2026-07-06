@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FinanceApp Pro — Finanças Pessoais</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --surface: #ffffff;
+    --text: #1a1f36;
+    --text-muted: #6b7280;
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --border: #e5e7eb;
+    --shadow: 0 4px 20px rgba(0,0,0,0.06);
+    --shadow-hover: 0 8px 30px rgba(99,102,241,0.15);
+    --radius: 14px;
+    --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .app {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 24px;
+    font-weight: 800;
+  }
+  .logo-icon {
+    width: 48px; height: 48px;
+    background: var(--gradient);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+  }
+  .header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .date-badge {
+    background: var(--surface);
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    box-shadow: var(--shadow);
+  }
+  .status-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--success);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* CARDS DE RESUMO */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  .summary-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .summary-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+  }
+  .summary-card.featured {
+    background: var(--gradient);
+    color: white;
+  }
+  .summary-card.featured .label,
+  .summary-card.featured .value { color: white; }
+  .summary-card.featured .label { opacity: 0.85; }
+
+  .summary-card .icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px;
+  }
+  .icon-income { background: rgba(16,185,129,0.12); color: var(--success); }
+  .icon-expense { background: rgba(239,68,68,0.12); color: var(--danger); }
+  .icon-balance { background: rgba(255,255,255,0.25); color: white; }
+  .icon-payments { background: rgba(245,158,11,0.12); color: var(--warning); }
+
+  .summary-card .label {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .summary-card .value {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .summary-card .trend {
+    font-size: 12px;
+    margin-top: 8px;
+    color: var(--text-muted);
+  }
+
+  /* LAYOUT PRINCIPAL */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+  @media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: var(--shadow);
+  }
+  .panel h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .panel h2 .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+  }
+
+  /* FORMULÁRIOS */
+  .form-group {
+    margin-bottom: 16px;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  input, select, textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fafbfc;
+    transition: all 0.15s;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: var(--gradient);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+  }
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(99,102,241,0.4);
+  }
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--text);
+    border: 1.5px solid var(--border);
+  }
+  .btn-secondary:hover { background: #e9ecf3; }
+
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #f8f9fc;
+    border-radius: 10px;
+    margin-bottom: 16px;
+  }
+  .checkbox-group input { width: auto; }
+  .checkbox-group label { margin: 0; font-size: 13px; cursor: pointer; }
+
+  /* LISTAS */
+  .list {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .list::-webkit-scrollbar { width: 6px; }
+  .list::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    background: #fafbfc;
+    transition: background 0.15s;
+  }
+  .item:hover { background: #f1f3f8; }
+
+  .item-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .item-icon.income { background: rgba(16,185,129,0.12); color: var(--success); }
+  .item-icon.expense { background: rgba(239,68,68,0.12); color: var(--danger); }
+  .item-icon.payment { background: rgba(245,158,11,0.12); color: var(--warning); }
+
+  .item-info { flex: 1; min-width: 0; }
+  .item-title {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .item-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .item-value {
+    font-weight: 700;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .item-value.positive { color: var(--success); }
+  .item-value.negative { color: var(--danger); }
+
+  .item-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .icon-btn {
+    width: 32px; height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .icon-btn:hover { background: #e5e7eb; color: var(--primary); }
+  .icon-btn.delete:hover { color: var(--danger); }
+
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--text);
+    color: white;
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 1000;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--danger); }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: #f1f3f8;
+    padding: 4px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  .tab {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .tab.active {
+    background: white;
+    color: var(--text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 32px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .modal h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 600px) {
+    .app { padding: 16px; }
+    .summary-card .value { font-size: 22px; }
+    .panel { padding: 20px; }
+    .row, .row-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23"></line>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+      </div>
+      <span>FinanceApp Pro</span>
+    </div>
+    <div class="header-actions">
+      <div class="status-dot"></div>
+      <div class="date-badge" id="currentDate"></div>
+    </div>
+  </header>
+
+  <!-- RESUMO -->
+  <section class="summary-grid">
+    <div class="summary-card">
+      <div class="icon icon-income">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+      </div>
+      <div class="label">Total de Entradas</div>
+      <div class="value" id="totalIncome">R$ 0,00</div>
+      <div class="trend">Receitas acumuladas</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="icon icon-expense">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>
+      </div>
+      <div class="label">Total de Saídas</div>
+      <div class="value" id="totalExpense">R$ 0,00</div>
+      <div class="trend">Despesas acumuladas</div>
+    </div>
+
+    <div class="summary-card featured">
+      <div class="icon icon-balance">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path></svg>
+      </div>
+      <div class="label">Saldo Atual</div>
+      <div class="value" id="totalBalance">R$ 0,00</div>
+      <div class="trend" style="opacity:0.85">Entradas − Saídas</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="icon icon-payments">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      </div>
+      <div class="label">Pagamentos Futuros</div>
+      <div class="value" id="pendingPayments">0</div>
+      <div class="trend">Agendamentos pendentes</div>
+    </div>
+  </section>
+
+  <!-- FORMULÁRIOS -->
+  <section class="main-grid">
+    <!-- Transações -->
+    <div class="panel">
+      <h2><span class="dot"></span> Nova Transação</h2>
+      <form id="transactionForm">
+        <div class="form-group">
+          <label>Título</label>
+          <input type="text" id="txTitle" placeholder="Ex: Salário mensal, Aluguel..." required />
+        </div>
+        <div class="form-group">
+          <label>Descrição (opcional)</label>
+          <input type="text" id="txDescription" placeholder="Detalhes adicionais..." />
+        </div>
+        <div class="row-3">
+          <div class="form-group">
+            <label>Valor (R$)</label>
+            <input type="number" id="txAmount" step="0.01" min="0.01" placeholder="0,00" required />
+          </div>
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="txType">
+              <option value="income">Entrada</option>
+              <option value="expense">Saída</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Data</label>
+            <input type="datetime-local" id="txDate" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Categoria</label>
+          <select id="txCategory">
+            <option>Salário</option>
+            <option>Alimentação</option>
+            <option>Transporte</option>
+            <option>Moradia</option>
+            <option>Saúde</option>
+            <option>Lazer</option>
+            <option>Educação</option>
+            <option>Investimentos</option>
+            <option>Outros</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Adicionar Transação
+        </button>
+      </form>
+    </div>
+
+    <!-- Pagamentos Futuros -->
+    <div class="panel">
+      <h2><span class="dot" style="background:var(--warning)"></span> Pagamento Futuro</h2>
+      <form id="paymentForm">
+        <div class="form-group">
+          <label>Título do Pagamento</label>
+          <input type="text" id="payTitle" placeholder="Ex: Parcela do carro, Fatura cartão..." required />
+        </div>
+        <div class="form-group">
+          <label>Descrição (opcional)</label>
+          <input type="text" id="payDescription" placeholder="Detalhes do pagamento..." />
+        </div>
+        <div class="row-3">
+          <div class="form-group">
+            <label>Valor (R$)</label>
+            <input type="number" id="payAmount" step="0.01" min="0.01" placeholder="0,00" required />
+          </div>
+          <div class="form-group">
+            <label>Data de Vencimento</label>
+            <input type="datetime-local" id="payDate" required />
+          </div>
+          <div class="form-group">
+            <label>Categoria</label>
+            <select id="payCategory">
+              <option>Moradia</option>
+              <option>Transporte</option>
+              <option>Alimentação</option>
+              <option>Saúde</option>
+              <option>Educação</option>
+              <option>Lazer</option>
+              <option>Outros</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Telefone para Lembrete (opcional)</label>
+          <input type="tel" id="payPhone" placeholder="+5511999999999" />
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="payNotify" />
+          <label for="payNotify">📱 Enviar lembrete via SMS (Twilio)</label>
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          Agendar Pagamento
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- LISTAS -->
+  <section class="main-grid">
+    <div class="panel">
+      <h2><span class="dot"></span> Histórico de Transações</h2>
+      <div class="tabs">
+        <button class="tab active" data-filter="all">Todas</button>
+        <button class="tab" data-filter="income">Entradas</button>
+        <button class="tab" data-filter="expense">Saídas</button>
+      </div>
+      <div class="list" id="transactionsList"></div>
+    </div>
+
+    <div class="panel">
+      <h2><span class="dot" style="background:var(--warning)"></span> Pagamentos Futuros</h2>
+      <div class="list" id="paymentsList"></div>
+    </div>
+  </section>
+</div>
+
+<!-- MODAL DE EDIÇÃO -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h3 id="modalTitle">Editar Transação</h3>
+    <form id="editForm">
+      <input type="hidden" id="editId" />
+      <input type="hidden" id="editType" />
+      <div class="form-group">
+        <label>Título</label>
+        <input type="text" id="editTitle" required />
+      </div>
+      <div class="form-group">
+        <label>Descrição</label>
+        <input type="text" id="editDescription" />
+      </div>
+      <div class="row-3">
+        <div class="form-group">
+          <label>Valor (R$)</label>
+          <input type="number" id="editAmount" step="0.01" min="0.01" required />
+        </div>
+        <div class="form-group">
+          <label>Data</label>
+          <input type="datetime-local" id="editDate" required />
+        </div>
+        <div class="form-group">
+          <label>Categoria</label>
+          <select id="editCategory">
+            <option>Salário</option>
+            <option>Alimentação</option>
+            <option>Transporte</option>
+            <option>Moradia</option>
+            <option>Saúde</option>
+            <option>Lazer</option>
+            <option>Educação</option>
+            <option>Investimentos</option>
+            <option>Outros</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:20px">
+        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- SUPABASE SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  /* ============ CONFIGURAÇÃO SUPABASE ============ */
+  // IMPORTANTE: Substitua com suas credenciais do Supabase
+  const SUPABASE_URL = 'https://SEU-PROJETO.supabase.co';
+  const SUPABASE_ANON_KEY = 'SUA-CHAVE-ANON-AQUI';
+  
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  /* ============ ESTADO ============ */
+  const state = {
+    transactions: [],
+    payments: [],
+    filter: 'all'
+  };
+
+  /* ============ UTILITÁRIOS ============ */
+  const fmt = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const formatDate = dateStr => {
+    const d = new Date(dateStr);
+    return d.toLocaleString('pt-BR', { 
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  };
+
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  /* ============ DATA ATUAL ============ */
+  document.getElementById('currentDate').textContent =
+    new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+
+  // Definir data/hora atual como valor padrão
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  const defaultDateTime = now.toISOString().slice(0, 16);
+  document.getElementById('txDate').value = defaultDateTime;
+
+  /* ============ CARREGAR DADOS DO SUPABASE ============ */
+  async function loadData() {
+    try {
+      // Carregar transações
+      const { data: transactions, error: txError } = await supabase
+        .from('transactions')
+        .select('*')
+        .order('date', { ascending: false });
+      
+      if (txError) throw txError;
+      state.transactions = transactions || [];
+
+      // Carregar pagamentos
+      const { data: payments, error: payError } = await supabase
+        .from('payments')
+        .select('*')
+        .order('date', { ascending: false });
+      
+      if (payError) throw payError;
+      state.payments = payments || [];
+
+      render();
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
+      showToast('Erro ao carregar dados do Supabase', 'error');
+    }
+  }
+
+  /* ============ TRANSAÇÕES ============ */
+  document.getElementById('transactionForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    
+    const tx = {
+      title: document.getElementById('txTitle').value.trim(),
+      description: document.getElementById('txDescription').value.trim(),
+      amount: parseFloat(document.getElementById('txAmount').value),
+      type: document.getElementById('txType').value,
+      category: document.getElementById('txCategory').value,
+      date: new Date(document.getElementById('txDate').value).toISOString()
+    };
+
+    try {
+      const { data, error } = await supabase
+        .from('transactions')
+        .insert([tx])
+        .select();
+
+      if (error) throw error;
+
+      state.transactions.unshift(data[0]);
+      render();
+      e.target.reset();
+      document.getElementById('txDate').value = defaultDateTime;
+      showToast('Transação adicionada!', 'success');
+    } catch (error) {
+      console.error('Erro ao adicionar transação:', error);
+      showToast('Erro ao adicionar transação', 'error');
+    }
+  });
+
+  async function deleteTransaction(id) {
+    if (!confirm('Tem certeza que deseja remover esta transação?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      state.transactions = state.transactions.filter(t => t.id !== id);
+      render();
+      showToast('Transação removida');
+    } catch (error) {
+      console.error('Erro ao remover:', error);
+      showToast('Erro ao remover transação', 'error');
+    }
+  }
+
+  function editTransaction(id) {
+    const tx = state.transactions.find(t => t.id === id);
+    if (!tx) return;
+
+    document.getElementById('editId').value = tx.id;
+    document.getElementById('editType').value = 'transaction';
+    document.getElementById('editTitle').value = tx.title;
+    document.getElementById('editDescription').value = tx.description || '';
+    document.getElementById('editAmount').value = tx.amount;
+    document.getElementById('editCategory').value = tx.category;
+    
+    const date = new Date(tx.date);
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    document.getElementById('editDate').value = date.toISOString().slice(0, 16);
+
+    document.getElementById('modalTitle').textContent = 'Editar Transação';
+    document.getElementById('editModal').classList.add('show');
+  }
+
+  /* ============ PAGAMENTOS ============ */
+  document.getElementById('paymentForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    
+    const pay = {
+      title: document.getElementById('payTitle').value.trim(),
+      description: document.getElementById('payDescription').value.trim(),
+      amount: parseFloat(document.getElementById('payAmount').value),
+      date: new Date(document.getElementById('payDate').value).toISOString(),
+      category: document.getElementById('payCategory').value,
+      phone: document.getElementById('payPhone').value.trim(),
+      notify: document.getElementById('payNotify').checked,
+      status: 'pending'
+    };
+
+    try {
+      const { data, error } = await supabase
+        .from('payments')
+        .insert([pay])
+        .select();
+
+      if (error) throw error;
+
+      if (pay.notify && pay.phone) {
+        await sendTwilioReminder(pay);
+      }
+
+      state.payments.unshift(data[0]);
+      render();
+      e.target.reset();
+      showToast('Pagamento agendado!', 'success');
+    } catch (error) {
+      console.error('Erro ao agendar pagamento:', error);
+      showToast('Erro ao agendar pagamento', 'error');
+    }
+  });
+
+  async function markPaid(id) {
+    const p = state.payments.find(p => p.id === id);
+    if (!p) return;
+
+    try {
+      // Atualizar status do pagamento
+      const { error: payError } = await supabase
+        .from('payments')
+        .update({ status: 'paid' })
+        .eq('id', id);
+
+      if (payError) throw payError;
+
+      // Adicionar como transação de saída
+      const tx = {
+        title: p.title,
+        description: p.description || 'Pagamento agendado',
+        amount: p.amount,
+        type: 'expense',
+        category: p.category,
+        date: new Date().toISOString()
+      };
+
+      const { error: txError } = await supabase
+        .from('transactions')
+        .insert([tx]);
+
+      if (txError) throw txError;
+
+      // Recarregar dados
+      await loadData();
+      showToast('Pagamento marcado como pago!', 'success');
+    } catch (error) {
+      console.error('Erro ao marcar como pago:', error);
+      showToast('Erro ao atualizar pagamento', 'error');
+    }
+  }
+
+  async function deletePayment(id) {
+    if (!confirm('Tem certeza que deseja remover este pagamento?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('payments')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      state.payments = state.payments.filter(p => p.id !== id);
+      render();
+      showToast('Pagamento removido');
+    } catch (error) {
+      console.error('Erro ao remover:', error);
+      showToast('Erro ao remover pagamento', 'error');
+    }
+  }
+
+  function editPayment(id) {
+    const pay = state.payments.find(p => p.id === id);
+    if (!pay) return;
+
+    document.getElementById('editId').value = pay.id;
+    document.getElementById('editType').value = 'payment';
+    document.getElementById('editTitle').value = pay.title;
+    document.getElementById('editDescription').value = pay.description || '';
+    document.getElementById('editAmount').value = pay.amount;
+    document.getElementById('editCategory').value = pay.category;
+    
+    const date = new Date(pay.date);
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    document.getElementById('editDate').value = date.toISOString().slice(0, 16);
+
+    document.getElementById('modalTitle').textContent = 'Editar Pagamento';
+    document.getElementById('editModal').classList.add('show');
+  }
+
+  /* ============ FORMULÁRIO DE EDIÇÃO ============ */
+  document.getElementById('editForm').addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const id = document.getElementById('editId').value;
+    const type = document.getElementById('editType').value;
+
+    const updates = {
+      title: document.getElementById('editTitle').value.trim(),
+      description: document.getElementById('editDescription').value.trim(),
+      amount: parseFloat(document.getElementById('editAmount').value),
+      category: document.getElementById('editCategory').value,
+      date: new Date(document.getElementById('editDate').value).toISOString()
+    };
+
+    try {
+      const table = type === 'transaction' ? 'transactions' : 'payments';
+      
+      const { error } = await supabase
+        .from(table)
+        .update(updates)
+        .eq('id', id);
+
+      if (error) throw error;
+
+      closeModal();
+      await loadData();
+      showToast('Alterações salvas!', 'success');
+    } catch (error) {
+      console.error('Erro ao atualizar:', error);
+      showToast('Erro ao salvar alterações', 'error');
+    }
+  });
+
+  function closeModal() {
+    document.getElementById('editModal').classList.remove('show');
+  }
+
+  /* ============ TWILIO ============ */
+  async function sendTwilioReminder(payment) {
+    const message = `Lembrete FinanceApp: pagamento de ${fmt(payment.amount)} - "${payment.title}" vence em ${formatDate(payment.date)}.`;
+
+    try {
+      const response = await fetch('/api/send-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: payment.phone,
+          message: message
+        })
+      });
+      
+      if (response.ok) {
+        showToast('Lembrete SMS enviado!', 'success');
+      } else {
+        showToast('Falha ao enviar SMS', 'error');
+      }
+    } catch (err) {
+      console.warn('Backend SMS indisponível:', err);
+      showToast('Lembrete agendado (backend offline)', '');
+    }
+  }
+
+  /* ============ FILTROS ============ */
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.filter = tab.dataset.filter;
+      renderTransactions();
+    });
+  });
+
+  /* ============ RENDER ============ */
+  function render() {
+    renderSummary();
+    renderTransactions();
+    renderPayments();
+  }
+
+  function renderSummary() {
+    const income = state.transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+    const expense = state.transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+    const pending = state.payments.filter(p => p.status === 'pending').length;
+
+    document.getElementById('totalIncome').textContent = fmt(income);
+    document.getElementById('totalExpense').textContent = fmt(expense);
+    document.getElementById('totalBalance').textContent = fmt(income - expense);
+    document.getElementById('pendingPayments').textContent = pending;
+  }
+
+  function renderTransactions() {
+    const list = document.getElementById('transactionsList');
+    let items = state.transactions;
+    if (state.filter !== 'all') items = items.filter(t => t.type === state.filter);
+
+    if (items.length === 0) {
+      list.innerHTML = `<div class="empty"><div class="empty-icon">📭</div>Nenhuma transação ainda</div>`;
+      return;
+    }
+
+    list.innerHTML = items.map(t => `
+      <div class="item">
+        <div class="item-icon ${t.type}">
+          ${t.type === 'income' ? '↑' : '↓'}
+        </div>
+        <div class="item-info">
+          <div class="item-title">${t.title}</div>
+          <div class="item-sub">
+            ${t.description ? t.description + ' • ' : ''}${t.category} • ${formatDate(t.date)}
+          </div>
+        </div>
+        <div class="item-value ${t.type === 'income' ? 'positive' : 'negative'}">
+          ${t.type === 'income' ? '+' : '−'} ${fmt(t.amount)}
+        </div>
+        <div class="item-actions">
+          <button class="icon-btn" onclick="editTransaction('${t.id}')" title="Editar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          </button>
+          <button class="icon-btn delete" onclick="deleteTransaction('${t.id}')" title="Remover">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"></path></svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderPayments() {
+    const list = document.getElementById('paymentsList');
+    if (state.payments.length === 0) {
+      list.innerHTML = `<div class="empty"><div class="empty-icon">📅</div>Nenhum pagamento agendado</div>`;
+      return;
+    }
+
+    list.innerHTML = state.payments.map(p => `
+      <div class="item">
+        <div class="item-icon ${p.status === 'paid' ? 'income' : 'payment'}">
+          ${p.status === 'paid' ? '✓' : '⏰'}
+        </div>
+        <div class="item-info">
+          <div class="item-title">${p.title}</div>
+          <div class="item-sub">
+            ${p.description ? p.description + ' • ' : ''}${p.category} • 
+            Vence: ${formatDate(p.date)}
+            ${p.notify ? ' • 📱 SMS' : ''}
+            ${p.status === 'paid' ? ' • <b style="color:var(--success)">Pago</b>' : ''}
+          </div>
+        </div>
+        <div class="item-value negative">${fmt(p.amount)}</div>
+        <div class="item-actions">
+          ${p.status === 'pending' ? `
+            <button class="icon-btn" onclick="markPaid('${p.id}')" title="Marcar como pago" style="color:var(--success)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </button>
+          ` : ''}
+          <button class="icon-btn" onclick="editPayment('${p.id}')" title="Editar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          </button>
+          <button class="icon-btn delete" onclick="deletePayment('${p.id}')" title="Remover">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"></path></svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Carregar dados ao iniciar
+  loadData();
+</script>
+</body>
+</html>
